@@ -1,0 +1,85 @@
+
+
+html,
+body, {
+  height: 100%;
+}
+
+
+.card {
+    --bs-card-spacer-y: 1.3rem !important;
+    --bs-card-spacer-x: 1.3rem !important;
+}
+.btn-gkm {
+  font-family: "Bison", sans-serif !important;
+  font-size: 1.25rem;  
+  letter-spacing: .1rem;
+  font-weight: 400;
+  --bs-btn-color: #fff;
+  --bs-btn-bg: rgb(194, 27, 23);
+  --bs-btn-border-color: rgb(194, 27, 23);
+  -webkit-appearance: none;  /* Safari / iOS */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;          /* Standard */
+}
+.btn-gkm:hover, .btn-gkm:active {
+  font-family: "Bison", sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: .1rem;
+  font-weight: 400;
+  background: rgb(139, 20, 17);
+  border: 1px solid rgb(139, 20, 17);
+  -webkit-appearance: none;  /* Safari / iOS */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;          /* Standard */
+}
+
+.form-control:focus {
+    border-color: rgb(194, 27, 23);
+    box-shadow: 0 0 0 0.2rem rgba(194, 27, 23, 0.25);
+} 
+.border-gkm {
+  border-color: rgb(194, 27, 23);
+}
+
+.text-gkm {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.8;
+  color: rgb(194, 27, 23);
+}
+.text-gkm-sm {
+  font-size: 0.9rem !important;
+}
+.text-gkm-h1 {
+  font-size: 1.75rem;
+  letter-spacing: .11rem;
+  line-height: 100%;
+  word-break: break-word;
+  text-transform: uppercase;
+  font-style: italic;
+  color: rgb(194, 27, 23);
+  font-weight: bolder;
+}
+    
+.form-signin {
+  max-width: 330px;
+  padding: 1rem;
+}
+
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

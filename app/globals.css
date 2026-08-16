@@ -1,0 +1,31 @@
+:root {
+  --gkm-red: #c8102e;
+}
+
+body {
+  background-color: #f5f5f5;
+}
+
+.text-gkm {
+  color: var(--gkm-red);
+}
+
+.text-gkm-sm {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.btn-gkm {
+  background-color: var(--gkm-red);
+  border-color: var(--gkm-red);
+  color: #fff;
+}
+
+.border-gkm {
+  border-color: var(--gkm-red) !important;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}

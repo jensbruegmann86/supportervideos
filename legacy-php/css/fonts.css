@@ -1,0 +1,223 @@
+/* =========================
+   BISON
+   ========================= */
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-Regular.woff2') format('woff2'),
+       url('../fonts/Bison-Regular.woff') format('woff'),
+       url('../fonts/Bison-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-RegularItalic.woff2') format('woff2'),
+       url('../fonts/Bison-RegularItalic.woff') format('woff'),
+       url('../fonts/Bison-RegularItalic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-Light.woff2') format('woff2'),
+       url('../fonts/Bison-Light.woff') format('woff'),
+       url('../fonts/Bison-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-LightItalic.woff2') format('woff2'),
+       url('../fonts/Bison-LightItalic.woff') format('woff'),
+       url('../fonts/Bison-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-DemiBold.woff2') format('woff2'),
+       url('../fonts/Bison-DemiBold.woff') format('woff'),
+       url('../fonts/Bison-DemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-DemiBoldItalic.woff2') format('woff2'),
+       url('../fonts/Bison-DemiBoldItalic.woff') format('woff'),
+       url('../fonts/Bison-DemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-Bold.woff2') format('woff2'),
+       url('../fonts/Bison-Bold.woff') format('woff'),
+       url('../fonts/Bison-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-BoldItalic.woff2') format('woff2'),
+       url('../fonts/Bison-BoldItalic.woff') format('woff'),
+       url('../fonts/Bison-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Optional Outline Varianten */
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-ThickOutline.woff2') format('woff2'),
+       url('../fonts/Bison-ThickOutline.woff') format('woff'),
+       url('../fonts/Bison-ThickOutline.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-ThickOutlineItalic.woff2') format('woff2'),
+       url('../fonts/Bison-ThickOutlineItalic.woff') format('woff'),
+       url('../fonts/Bison-ThickOutlineItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-ThinOutline.woff2') format('woff2'),
+       url('../fonts/Bison-ThinOutline.woff') format('woff'),
+       url('../fonts/Bison-ThinOutline.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bison';
+  src: url('../fonts/Bison-ThinOutlineItalic.woff2') format('woff2'),
+       url('../fonts/Bison-ThinOutlineItalic.woff') format('woff'),
+       url('../fonts/Bison-ThinOutlineItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+}
+
+
+/* =========================
+   ROBOTO
+   ========================= */
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Thin.woff2') format('woff2'),
+       url('../fonts/Roboto-Thin.woff') format('woff'),
+       url('../fonts/Roboto-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-ThinItalic.woff2') format('woff2'),
+       url('../fonts/Roboto-ThinItalic.woff') format('woff'),
+       url('../fonts/Roboto-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Light.woff2') format('woff2'),
+       url('../fonts/Roboto-Light.woff') format('woff'),
+       url('../fonts/Roboto-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-LightItalic.woff2') format('woff2'),
+       url('../fonts/Roboto-LightItalic.woff') format('woff'),
+       url('../fonts/Roboto-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Regular.woff2') format('woff2'),
+       url('../fonts/Roboto-Regular.woff') format('woff'),
+       url('../fonts/Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Italic.woff2') format('woff2'),
+       url('../fonts/Roboto-Italic.woff') format('woff'),
+       url('../fonts/Roboto-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Medium.woff2') format('woff2'),
+       url('../fonts/Roboto-Medium.woff') format('woff'),
+       url('../fonts/Roboto-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-MediumItalic.woff2') format('woff2'),
+       url('../fonts/Roboto-MediumItalic.woff') format('woff'),
+       url('../fonts/Roboto-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Bold.woff2') format('woff2'),
+       url('../fonts/Roboto-Bold.woff') format('woff'),
+       url('../fonts/Roboto-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-BoldItalic.woff2') format('woff2'),
+       url('../fonts/Roboto-BoldItalic.woff') format('woff'),
+       url('../fonts/Roboto-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Black.woff2') format('woff2'),
+       url('../fonts/Roboto-Black.woff') format('woff'),
+       url('../fonts/Roboto-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-BlackItalic.woff2') format('woff2'),
+       url('../fonts/Roboto-BlackItalic.woff') format('woff'),
+       url('../fonts/Roboto-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+}
