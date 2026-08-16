@@ -3,40 +3,40 @@ export default function TermsPage() {
     <div className="container py-4">
       <div className="row justify-content-center">
         <div className="col-md-10 col-lg-8">
-          <h4>Einverst\u00e4ndniserkl\u00e4rung zur Nutzung von Video-Uploads</h4>
+          <h4>Einverständniserklärung zur Nutzung von Video-Uploads</h4>
           <p>
-            Mit dem Hochladen eines Videos erkl\u00e4ren Sie sich ausdr\u00fccklich mit den
+            Mit dem Hochladen eines Videos erklären Sie sich ausdrücklich mit den
             folgenden Bedingungen einverstanden:
           </p>
           <ol>
             <li>
-              <strong>Rechte\u00fcbertragung:</strong> Sie r\u00e4umen dem Veranstalter
-              (Kölner AusdauerSport GmbH, Girlitzweg 30 Tor 5-A, 50829 K\u00f6ln) mit dem
-              Upload des Videos ein einfaches, zeitlich, r\u00e4umlich und inhaltlich
+              <strong>Rechteübertragung:</strong> Sie räumen dem Veranstalter
+              (Kölner AusdauerSport GmbH, Girlitzweg 30 Tor 5-A, 50829 Köln) mit dem
+              Upload des Videos ein einfaches, zeitlich, räumlich und inhaltlich
               unbegrenztes Nutzungsrecht an dem hochgeladenen Video ein. Dies umfasst
-              insbesondere das Recht zur Speicherung, Bearbeitung, Vervielf\u00e4ltigung,
-              \u00f6ffentlichen Zug\u00e4nglichmachung, Verbreitung und Vorf\u00fchrung in allen
-              bekannten und zuk\u00fcnftigen Medienformaten.
+              insbesondere das Recht zur Speicherung, Bearbeitung, Vervielfältigung,
+              öffentlichen Zugänglichmachung, Verbreitung und Vorführung in allen
+              bekannten und zukünftigen Medienformaten.
             </li>
             <li>
-              <strong>Verzicht auf Urheberpers\u00f6nlichkeitsrechte:</strong> Sie
-              verzichten, soweit gesetzlich zul\u00e4ssig, auf die Geltendmachung von
-              Urheberpers\u00f6nlichkeitsrechten (z. B. das Recht auf Namensnennung).
+              <strong>Verzicht auf Urheberpersönlichkeitsrechte:</strong> Sie
+              verzichten, soweit gesetzlich zulässig, auf die Geltendmachung von
+              Urheberpersönlichkeitsrechten (z. B. das Recht auf Namensnennung).
             </li>
             <li>
               <strong>Rechte Dritter:</strong> Sie versichern, dass das hochgeladene
-              Video frei von Rechten Dritter ist. Sollten dennoch Anspr\u00fcche geltend
-              gemacht werden, stellen Sie den Veranstalter von s\u00e4mtlichen
-              Anspr\u00fcchen Dritter frei.
+              Video frei von Rechten Dritter ist. Sollten dennoch Ansprüche geltend
+              gemacht werden, stellen Sie den Veranstalter von sämtlichen
+              Ansprüchen Dritter frei.
             </li>
             <li>
-              <strong>Unentgeltlichkeit:</strong> Die Rechteeinr\u00e4umung erfolgt
-              unentgeltlich. Sie haben keinen Anspruch auf Verg\u00fctung.
+              <strong>Unentgeltlichkeit:</strong> Die Rechteeinräumung erfolgt
+              unentgeltlich. Sie haben keinen Anspruch auf Vergütung.
             </li>
             <li>
-              <strong>Datenschutz:</strong> Mit dem Upload erkl\u00e4ren Sie sich
+              <strong>Datenschutz:</strong> Mit dem Upload erklären Sie sich
               einverstanden, dass Ihre im Video enthaltenen personenbezogenen Daten im
-              Rahmen der Nutzung verarbeitet und ver\u00f6ffentlicht werden d\u00fcrfen.
+              Rahmen der Nutzung verarbeitet und veröffentlicht werden dürfen.
             </li>
           </ol>
         </div>
