@@ -10,6 +10,7 @@ export default function PlayerPage({ params }) {
   const [playlist, setPlaylist] = useState([]);
   const [current, setCurrent] = useState(0);
   const [waiting, setWaiting] = useState(true);
+  const [scale, setScale] = useState(1);
   const videoRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -36,9 +37,10 @@ export default function PlayerPage({ params }) {
 
   useEffect(() => {
     // Scale the fixed 1920x1080 (16:9) stage to fit whatever screen it runs on.
+    // Kept as React state (not a CSS custom property) so the transform always
+    // reflects the current viewport, even before the browser resolves vars.
     function fit() {
-      const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-      document.documentElement.style.setProperty("--scale", String(scale));
+      setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080));
     }
     fit();
     window.addEventListener("resize", fit);
@@ -72,7 +74,13 @@ export default function PlayerPage({ params }) {
 
   return (
     <div style={styles.stage}>
-      <div style={{ ...styles.frame, backgroundImage: `url(/backgrounds/${bgFile})` }}>
+      <div
+        style={{
+          ...styles.frame,
+          transform: `scale(${scale})`,
+          backgroundImage: `url(/backgrounds/${bgFile})`,
+        }}
+      >
         {clip ? (
           <video
             ref={videoRef}
@@ -84,7 +92,13 @@ export default function PlayerPage({ params }) {
             style={isPortrait ? styles.videoPortrait : styles.videoLandscape}
           />
         ) : (
-          <div style={styles.idle}>Warte auf n\u00e4chstes Video (Screen {screenId})...</div>
+          <div style={styles.idle}>
+            <div style={styles.idleCard}>
+              <div style={styles.idlePulse} />
+              <p style={styles.idleTitle}>Bereit für dein Video!</p>
+              <p style={styles.idleSubtitle}>Screen {screenId} wartet auf den nächsten Zieleinlauf...</p>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -105,7 +119,6 @@ const styles = {
     position: "relative",
     width: "1920px",
     height: "1080px",
-    transform: "scale(var(--scale, 1))",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
@@ -129,12 +142,42 @@ const styles = {
   },
   idle: {
     position: "absolute",
-    inset: 0,
+    left: 0,
+    top: 0,
+    width: "1436px",
+    height: "807px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#fff",
-    fontSize: "2rem",
     fontFamily: "sans-serif",
   },
+  idleCard: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "24px",
+    padding: "48px 64px",
+    borderRadius: "24px",
+    background: "rgba(0, 0, 0, 0.45)",
+    color: "#fff",
+    textAlign: "center",
+  },
+  idlePulse: {
+    width: "56px",
+    height: "56px",
+    borderRadius: "50%",
+    background: "#c8102e",
+    animation: "vu-pulse 1.6s ease-in-out infinite",
+  },
+  idleTitle: {
+    margin: 0,
+    fontSize: "2.4rem",
+    fontWeight: 700,
+  },
+  idleSubtitle: {
+    margin: 0,
+    fontSize: "1.3rem",
+    opacity: 0.85,
+  },
 };
+

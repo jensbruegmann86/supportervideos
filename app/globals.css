@@ -29,3 +29,15 @@ body {
   border: none;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
+
+@keyframes vu-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
+}

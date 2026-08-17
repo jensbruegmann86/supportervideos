@@ -60,7 +60,7 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {loading && <p>L\u00e4dt...</p>}
+      {loading && <p>Lädt...</p>}
       {!loading && videos.length === 0 && <p>Keine Videos in dieser Ansicht.</p>}
 
       {videos.map((v) => (
@@ -91,10 +91,10 @@ export default function AdminPage() {
                 <button
                   className="btn btn-danger"
                   onClick={() => {
-                    if (confirm("Video wirklich l\u00f6schen?")) act(v.id, "delete");
+                    if (confirm("Video wirklich löschen?")) act(v.id, "delete");
                   }}
                 >
-                  L\u00f6schen
+                  Löschen
                 </button>
               </>
             )}
