@@ -16,9 +16,19 @@ body {
   font-size: 0.85rem;
 }
 
-.btn-gkm {
+/* .btn.btn-gkm (not just .btn-gkm) so specificity beats Bootstrap's own .btn
+   rule regardless of stylesheet load order - otherwise Bootstrap's transparent
+   default background wins the cascade tie and the button looks unstyled. */
+.btn.btn-gkm {
   background-color: var(--gkm-red);
   border-color: var(--gkm-red);
+  color: #fff;
+}
+
+.btn.btn-gkm:hover,
+.btn.btn-gkm:focus {
+  background-color: #a30d25;
+  border-color: #a30d25;
   color: #fff;
 }
 

@@ -153,15 +153,17 @@ export default function UploadPage() {
                   />
                 </div>
               </div>
-              <div className="row g-3 mb-2 text-start">
-                <div className="col">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={agree}
-                      onChange={(e) => setAgree(e.target.checked)}
-                      required
-                    />{" "}
+              <div className="row g-3 mb-4 mt-1 text-start">
+                <div className="col d-flex align-items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="agreement"
+                    checked={agree}
+                    onChange={(e) => setAgree(e.target.checked)}
+                    required
+                    style={{ marginTop: "0.3rem" }}
+                  />
+                  <label htmlFor="agreement" className="mb-0">
                     Ich habe die <a href="/terms" target="_blank">Bedingungen</a> gelesen und stimme zu.
                   </label>
                 </div>
@@ -170,7 +172,7 @@ export default function UploadPage() {
                 <p className={status === "error" ? "text-danger" : ""}>{message}</p>
               )}
               <div className="d-grid">
-                <button className="btn btn-gkm" type="submit" disabled={status === "uploading" || status === "validating"}>
+                <button className="btn btn-gkm btn-lg" type="submit" disabled={status === "uploading" || status === "validating"}>
                   {status === "uploading"
                     ? "L\u00e4dt hoch..."
                     : status === "validating"
