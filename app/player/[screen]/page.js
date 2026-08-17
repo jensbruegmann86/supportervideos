@@ -4,13 +4,14 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 // Replaces player.php ... player6.php. One instance serves one physical
 // screen (params.screen = "1" or "2"), polling for the next queued video and
 // rendering it inside the 16:9 branded frame (backgrounds/bg_*_1080.png).
+// Fixed at the LED wall's native 1920x1080 resolution - no responsive
+// scaling, the browser showing this page is expected to run at that size.
 export default function PlayerPage({ params }) {
   const { screen } = use(params);
   const screenId = Number(screen) || 1;
   const [playlist, setPlaylist] = useState([]);
   const [current, setCurrent] = useState(0);
   const [waiting, setWaiting] = useState(true);
-  const [scale, setScale] = useState(1);
   const videoRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -34,18 +35,6 @@ export default function PlayerPage({ params }) {
     }, 1000);
     return () => clearInterval(pollRef.current);
   }, [waiting, poll]);
-
-  useEffect(() => {
-    // Scale the fixed 1920x1080 (16:9) stage to fit whatever screen it runs on.
-    // Kept as React state (not a CSS custom property) so the transform always
-    // reflects the current viewport, even before the browser resolves vars.
-    function fit() {
-      setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080));
-    }
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
 
   async function release(playLogId, isLast) {
     await fetch("/api/player/release", {
@@ -77,7 +66,6 @@ export default function PlayerPage({ params }) {
       <div
         style={{
           ...styles.frame,
-          transform: `scale(${scale})`,
           backgroundImage: `url(/backgrounds/${bgFile})`,
         }}
       >
@@ -107,18 +95,16 @@ export default function PlayerPage({ params }) {
 
 const styles = {
   stage: {
-    width: "100vw",
-    height: "100vh",
-    background: "#000",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    width: "1920px",
+    height: "1080px",
+    background: "#fff",
     overflow: "hidden",
   },
   frame: {
     position: "relative",
     width: "1920px",
     height: "1080px",
+    background: "#fff",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
