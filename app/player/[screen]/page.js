@@ -58,8 +58,7 @@ export default function PlayerPage({ params }) {
   }
 
   const clip = playlist[current];
-  const isPortrait = clip?.orientation === "portrait";
-  const bgFile = isPortrait ? "bg_portrait_1080.png" : "bg_landscape_1080.png";
+  const bgFile = "bg_landscape_1080.png";
 
   return (
     <div style={styles.stage}>
@@ -77,7 +76,7 @@ export default function PlayerPage({ params }) {
             autoPlay
             playsInline
             onEnded={handleEnded}
-            style={isPortrait ? styles.videoPortrait : styles.videoLandscape}
+            style={styles.videoLandscape}
           />
         ) : (
           <div style={styles.idle}>
@@ -115,15 +114,6 @@ const styles = {
     top: 0,
     width: "1436px",
     height: "807px",
-    objectFit: "cover",
-  },
-  videoPortrait: {
-    position: "absolute",
-    left: "50%",
-    top: 0,
-    width: "610px",
-    height: "1080px",
-    transform: "translateX(-50%)",
     objectFit: "cover",
   },
   idle: {

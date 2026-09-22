@@ -68,6 +68,11 @@ export default function UploadPage() {
         setMessage(`Video is longer than ${MAX_SECONDS} seconds (${meta.duration.toFixed(1)}s).`);
         return;
       }
+      if (meta.orientation === "portrait") {
+        setStatus("error");
+        setMessage("Please upload a video in landscape format only.");
+        return;
+      }
 
       setStatus("uploading");
       const signRes = await fetch("/api/upload/sign", {

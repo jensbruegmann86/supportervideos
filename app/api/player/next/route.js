@@ -36,11 +36,11 @@ export async function GET(request) {
 
   const { data: firstVideo } = await supabase
     .from("event_video")
-    .select("id, bib, approved, trash")
+    .select("id, bib, approved, trash, orientation")
     .eq("id", nextEntry.video_id)
     .maybeSingle();
 
-  if (!firstVideo || !firstVideo.approved || firstVideo.trash) {
+  if (!firstVideo || !firstVideo.approved || firstVideo.trash || firstVideo.orientation !== 2) {
     // stale entry (e.g. rejected after being queued) - discard and let the
     // next poll pick up the following queue item
     await supabase.from("video_play_log").update({ played: true, played_time: nowIso }).eq("id", nextEntry.id);
@@ -53,6 +53,7 @@ export async function GET(request) {
     .eq("bib", firstVideo.bib)
     .eq("approved", true)
     .eq("trash", false)
+    .eq("orientation", 2)
     .order("video_count", { ascending: true });
 
   const videoIds = (bibVideos || []).map((v) => v.id);
