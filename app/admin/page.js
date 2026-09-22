@@ -40,9 +40,14 @@ export default function AdminPage() {
     <div className="container p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Video Management Dashboard</h2>
-        <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
-          Logout
-        </button>
+        <div className="d-flex gap-2">
+          <a className="btn btn-outline-primary btn-sm" href="/api/admin/participants/export">
+            Startnummern mit Video (XLSX)
+          </a>
+          <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="btn-group mb-3">

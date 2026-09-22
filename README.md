@@ -19,14 +19,35 @@ Stack, der sich direkt über Git nach Vercel deployen lässt und Supabase
    des Browsers bestimmt.
 4. **Freigabe-Backend** – `/admin` (geschützt durch `ADMIN_PASSWORD`) zeigt offene
    Videos, erlaubt Freigabe oder Löschen (inkl. Storage-Datei).
-5. **Player** – `/player/1` und `/player/2` pollen `GET /api/player/next` und
-   spielen freigegebene Videos im 16:9-Rahmen (`public/backgrounds/bg_landscape_1080.png`).
-   Ein Zeitmess-Push (`POST /api/timing/webhook`) markiert Videos als startbereit.
+5. **Player** – `/player/1` pollt `GET /api/player/next` und spielt freigegebene
+  Videos im 16:9-Rahmen (`public/backgrounds/bg_landscape_1080.png`). Eine
+  RaceResult-Detektion kann per `GET /api/timing/webhook?bib=1234&key=...`
+  gemeldet werden. Ist Player 1 bereits belegt, wird die Detektion verworfen
+  (`queued: 0`, `blocked: true`), damit kein verspätetes Video abgespielt wird.
 6. **Abspiel-Log** – `video_play_log` hält fest, wann ein Video auf welchem Screen
    abgespielt wurde.
+7. **Admin-Export** – `/admin` bietet einen geschützten XLSX-Download aller
+  eindeutigen Startnummern mit mindestens einem nicht gelöschten Upload.
 
-### Zwei-Screen-Logik (Zusatzidee)
+### RaceResult-Webhook
 
+RaceResult sendet einen HTTPS-GET an:
+
+`https://<deine-vercel-domain>/api/timing/webhook?bib=1234&key=<TIMING_WEBHOOK_SECRET>`
+
+Der Wert von `TIMING_WEBHOOK_SECRET` wird nur als Vercel-Umgebungsvariable
+hinterlegt. `screen_id=1` ist der Standard und der aktuell vorgesehene Player.
+
+### Zwei-Screen-Logik (deaktiviert)
+
+Die frühere automatische Weiterleitung an Screen 2 ist für den aktuellen
+Ein-Screen-Betrieb deaktiviert. Der Player prüft weiterhin den Zustand `busy`:
+ein neuer Teilnehmer wird bei belegtem Player nicht in `video_play_log` eingetragen.
+
+Die frühere POST-Variante ist nicht mehr vorgesehen. Der aktuelle Aufruf ist der
+GET oben.
+
+<!--
 `POST /api/timing/webhook` mit `{ "bib": "1234", "screen_id": 1 }`:
 
 - Video wird sofort für Screen 1 in die Queue gestellt.
@@ -41,6 +62,7 @@ tatsächliche Laufzeit des Teilnehmers den Versatz erzeugt.
 Ein Screen ist während der Wiedergabe "busy" (`player_state.busy`) und wird erst
 nach dem letzten Clip der Playlist wieder freigegeben
 (`POST /api/player/release`).
+-->
 
 ## Setup
 
