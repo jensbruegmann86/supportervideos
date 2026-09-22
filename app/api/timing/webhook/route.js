@@ -20,17 +20,6 @@ export async function GET(request) {
   }
 
   const supabase = supabaseAdmin();
-  const { data: state, error: stateError } = await supabase
-    .from("player_state")
-    .select("busy")
-    .eq("screen_id", screenId)
-    .maybeSingle();
-
-  if (stateError) return NextResponse.json({ error: stateError.message }, { status: 500 });
-  if (state?.busy) {
-    return NextResponse.json({ queued: 0, blocked: true, message: "Player ist belegt." });
-  }
-
   const { data: videos, error } = await supabase
     .from("event_video")
     .select("id")
@@ -40,7 +29,28 @@ export async function GET(request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!videos || videos.length === 0) {
+    await supabase.from("video_detection_log").insert({ bib, screen_id: screenId, outcome: "no_video" });
     return NextResponse.json({ queued: 0, message: "Keine freigegebenen Videos f\u00fcr diese Startnummer." });
+  }
+
+  const { data: state, error: stateError } = await supabase
+    .from("player_state")
+    .select("busy")
+    .eq("screen_id", screenId)
+    .maybeSingle();
+
+  if (stateError) return NextResponse.json({ error: stateError.message }, { status: 500 });
+  if (state?.busy) {
+    const { error: logError } = await supabase.from("video_detection_log").insert(
+      videos.map((v) => ({
+        bib,
+        video_id: v.id,
+        screen_id: screenId,
+        outcome: "blocked",
+      }))
+    );
+    if (logError) return NextResponse.json({ error: logError.message }, { status: 500 });
+    return NextResponse.json({ queued: 0, blocked: true, message: "Player ist belegt." });
   }
 
   const now = new Date();
@@ -63,6 +73,16 @@ export async function GET(request) {
     .upsert(rows, { onConflict: "video_id,screen_id", ignoreDuplicates: true });
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
+
+  const { error: logError } = await supabase.from("video_detection_log").insert(
+    videos.map((v) => ({
+      bib,
+      video_id: v.id,
+      screen_id: screenId,
+      outcome: "queued",
+    }))
+  );
+  if (logError) return NextResponse.json({ error: logError.message }, { status: 500 });
 
   return NextResponse.json({ queued: videos.length, blocked: false });
 }

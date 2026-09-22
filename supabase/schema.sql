@@ -43,6 +43,20 @@ create table if not exists video_play_log (
 create index if not exists idx_play_log_queue
   on video_play_log (screen_id, played, scheduled_time);
 
+-- Every timing detection is retained for the admin statistics, including
+-- detections rejected while the player was busy.
+create table if not exists video_detection_log (
+  id bigint generated always as identity primary key,
+  bib text not null,
+  video_id bigint references event_video(id) on delete set null,
+  screen_id smallint not null,
+  detected_time timestamptz not null default now(),
+  outcome text not null check (outcome in ('queued', 'blocked', 'no_video'))
+);
+
+create index if not exists idx_detection_log_time
+  on video_detection_log (detected_time desc);
+
 -- One row per physical player/screen along the course
 create table if not exists player_state (
   screen_id smallint primary key,
@@ -64,6 +78,7 @@ create table if not exists app_settings (
 alter table event_participants enable row level security;
 alter table event_video enable row level security;
 alter table video_play_log enable row level security;
+alter table video_detection_log enable row level security;
 alter table player_state enable row level security;
 alter table app_settings enable row level security;
 

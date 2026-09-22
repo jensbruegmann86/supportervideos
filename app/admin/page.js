@@ -44,6 +44,9 @@ export default function AdminPage() {
           <a className="btn btn-outline-primary btn-sm" href="/api/admin/participants/export">
             Startnummern mit Video (XLSX)
           </a>
+          <a className="btn btn-outline-primary btn-sm" href="/admin/statistics">
+            Statistik
+          </a>
           <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
             Logout
           </button>
@@ -57,12 +60,9 @@ export default function AdminPage() {
         >
           Offen
         </button>
-        <button
-          className={`btn btn-sm ${status === "approved" ? "btn-primary" : "btn-outline-primary"}`}
-          onClick={() => setStatus("approved")}
-        >
+        <a className="btn btn-sm btn-outline-primary" href="/admin/approved">
           Freigegeben
-        </button>
+        </a>
       </div>
 
       {loading && <p>Lädt...</p>}

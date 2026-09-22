@@ -28,6 +28,13 @@ Stack, der sich direkt über Git nach Vercel deployen lässt und Supabase
    abgespielt wurde.
 7. **Admin-Export** – `/admin` bietet einen geschützten XLSX-Download aller
   eindeutigen Startnummern mit mindestens einem nicht gelöschten Upload.
+8. **Admin-Auswertung** – `/admin/approved` zeigt freigegebene Videos tabellarisch
+  mit Kommentar und Wiedergabelink; `/admin/statistics` zeigt Detektionen,
+  Abspielzeiten und wegen belegtem Player verworfene Videos.
+
+Für bestehende Supabase-Projekte muss einmal
+`supabase/migrations/20260922_video_detection_log.sql` im SQL Editor ausgeführt
+werden. Neue Projekte erhalten die Tabelle auch über `supabase/schema.sql`.
 
 ### RaceResult-Webhook
 
