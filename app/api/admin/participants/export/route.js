@@ -18,7 +18,9 @@ export async function GET() {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const bibs = [...new Set((data || []).map((row) => row.bib).filter(Boolean))];
-  const worksheet = XLSX.utils.json_to_sheet(bibs.map((bib) => ({ Startnummer: bib })));
+  const worksheet = XLSX.utils.json_to_sheet(
+    bibs.map((bib) => ({ Startnr: bib, SupporterVideo: 1 }))
+  );
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Startnummern");
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
