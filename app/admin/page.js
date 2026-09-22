@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import AdminNav from "./AdminNav";
 
 // Replaces dashboard.php / dashboard2.php / video_list.php.
 export default function AdminPage() {
@@ -31,38 +32,11 @@ export default function AdminPage() {
     load();
   }
 
-  async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
-    window.location.href = "/admin/login";
-  }
-
   return (
     <div className="container p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Video Management Dashboard</h2>
-        <div className="d-flex gap-2">
-          <a className="btn btn-outline-primary btn-sm" href="/api/admin/participants/export">
-            Startnummern mit Video (XLSX)
-          </a>
-          <a className="btn btn-outline-primary btn-sm" href="/admin/statistics">
-            Statistik
-          </a>
-          <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
-            Logout
-          </button>
-        </div>
-      </div>
-
-      <div className="btn-group mb-3">
-        <button
-          className={`btn btn-sm ${status === "pending" ? "btn-primary" : "btn-outline-primary"}`}
-          onClick={() => setStatus("pending")}
-        >
-          Offen
-        </button>
-        <a className="btn btn-sm btn-outline-primary" href="/admin/approved">
-          Freigegeben
-        </a>
+        <AdminNav active="pending" />
       </div>
 
       {loading && <p>Lädt...</p>}

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import AdminNav from "../AdminNav";
 
 function formatDate(value) {
   return value ? new Date(value).toLocaleString("de-DE") : "-";
@@ -8,11 +9,6 @@ function formatDate(value) {
 export default function ApprovedVideosPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
-    window.location.href = "/admin/login";
-  }
 
   useEffect(() => {
     fetch("/api/admin/videos?status=approved")
@@ -25,20 +21,7 @@ export default function ApprovedVideosPage() {
     <main className="container p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Freigegebene Videos</h2>
-        <div className="d-flex gap-2">
-          <a className="btn btn-outline-primary btn-sm" href="/api/admin/participants/export">
-            Startnummern mit Video (XLSX)
-          </a>
-          <a className="btn btn-primary btn-sm" href="/admin/approved">
-            Freigegeben
-          </a>
-          <a className="btn btn-outline-primary btn-sm" href="/admin/statistics">
-            Statistik
-          </a>
-          <button className="btn btn-outline-secondary btn-sm" onClick={logout}>
-            Logout
-          </button>
-        </div>
+        <AdminNav active="approved" />
       </div>
       {loading && <p>Lädt...</p>}
       {!loading && videos.length === 0 && <p>Keine freigegebenen Videos vorhanden.</p>}
