@@ -23,6 +23,10 @@ export async function POST(request) {
     );
   }
 
+  if (orientation === "portrait") {
+    return NextResponse.json({ error: "Bitte nur ein Video im Querformat hochladen." }, { status: 400 });
+  }
+
   const supabase = supabaseAdmin();
   const { error } = await supabase.from("event_video").insert({
     bib,

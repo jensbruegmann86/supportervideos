@@ -70,6 +70,11 @@ export default function UploadPage() {
         setMessage(`Video ist l\u00e4nger als ${MAX_SECONDS} Sekunden (${meta.duration.toFixed(1)}s).`);
         return;
       }
+      if (meta.orientation === "portrait") {
+        setStatus("error");
+        setMessage("Bitte nur ein Video im Querformat hochladen.");
+        return;
+      }
 
       setStatus("uploading");
       const signRes = await fetch("/api/upload/sign", {

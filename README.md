@@ -116,11 +116,10 @@ Preview-Umgebung). Vercel baut und deployed automatisch bei jedem Push.
   für eine harte serverseitige Prüfung müsste ein separater Verify-Schritt
   (z. B. Supabase Edge Function mit `ffmpeg.wasm`, oder ein kleiner externer
   Dienst) ergänzt werden.
-- **Querformat-Pflicht**: aktuell wird die Ausrichtung nur erkannt und
-  gespeichert (`orientation`), aber nicht erzwungen. Um künftig nur noch
-  Querformat zuzulassen, im Upload-Formular (`app/upload/page.js`) bei
-  `meta.orientation === "portrait"` einen Fehler ausgeben statt den Upload
-  fortzusetzen.
+- **Querformat-Pflicht**: Hochformat wird im Upload-Formular
+  (`app/upload/page.js`) vor dem Upload mit einer Fehlermeldung abgewiesen.
+  Die Complete-Route (`app/api/upload/complete`) weist Hochformat ebenfalls
+  zurück.
 - **Admin-Login** ist bewusst simpel gehalten (ein gemeinsames Passwort +
   signierter Cookie). Für mehrere Benutzer/Rollen bietet sich Supabase Auth an.
 - **Timing-Anbindung**: `poller.php` (Dauerschleife) entfällt – stattdessen soll
