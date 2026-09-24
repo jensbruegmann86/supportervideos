@@ -24,31 +24,36 @@ export async function GET(request) {
   }
 
   const terms = q.split(/\s+/).filter(Boolean);
-  const searchTerms = terms.length > 1 ? terms : [q];
-  const clauses = searchTerms.flatMap((term) => {
-    const like = `%${term}%`;
-    return [`bib.ilike.${like}`, `name.ilike.${like}`, `surname.ilike.${like}`];
-  });
+  const matches = await Promise.all(
+    terms.map(async (term) => {
+      const like = `%${term}%`;
+      return supabase
+        .from("event_participants")
+        .select("bib, name, surname, race")
+        .or(`bib.ilike.${like},name.ilike.${like},surname.ilike.${like}`)
+        .limit(100);
+    })
+  );
 
-  const { data, error } = await supabase
-    .from("event_participants")
-    .select("bib, name, surname, race")
-    .or(clauses.join(","))
-    .order("surname", { ascending: true })
-    .order("name", { ascending: true })
-    .limit(100);
+  const queryError = matches.find(({ error }) => error)?.error;
+  if (queryError) {
+    return NextResponse.json({ error: queryError.message }, { status: 500 });
+  }
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const uniqueParticipants = new Map();
+  for (const { data } of matches) {
+    for (const participant of data || []) {
+      uniqueParticipants.set(participant.bib, participant);
+    }
   }
 
   const normalizedTerms = terms.map((term) => term.toLocaleLowerCase("de-DE"));
-  const filtered = (data || []).filter((participant) => {
+  const filtered = [...uniqueParticipants.values()].filter((participant) => {
     if (normalizedTerms.length < 2) return true;
     const name = `${participant.name} ${participant.surname}`.toLocaleLowerCase("de-DE");
     const reverseName = `${participant.surname} ${participant.name}`.toLocaleLowerCase("de-DE");
     return normalizedTerms.every((term) => name.includes(term)) || normalizedTerms.every((term) => reverseName.includes(term));
-  });
+  }).sort((a, b) => `${a.surname} ${a.name}`.localeCompare(`${b.surname} ${b.name}`, "de-DE"));
 
   const results = exactMatch
     ? [exactMatch, ...filtered.filter((participant) => participant.bib !== exactMatch.bib)]
