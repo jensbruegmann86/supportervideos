@@ -26,7 +26,9 @@ export async function GET() {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const videoById = new Map((videos || []).map((video) => [video.id, video]));
-  const raceByBib = new Map((participants || []).map((participant) => [participant.bib, participant.race]));
+  const raceByBib = new Map(
+    (participants || []).map((participant) => [String(participant.bib).trim(), Number(participant.race)])
+  );
   const playedByVideoId = new Map((playLogs || []).map((log) => [log.video_id, log]));
   const raceStats = {
     marathon: { total: 0, approved: 0, deleted: 0 },
@@ -35,7 +37,7 @@ export async function GET() {
   };
 
   for (const video of videos || []) {
-    const raceValue = raceByBib.get(video.bib);
+    const raceValue = raceByBib.get(String(video.bib).trim());
     const race = raceStats[raceValue === 1 ? "marathon" : raceValue === 2 ? "halfMarathon" : "unknown"];
     race.total += 1;
     if (video.trash) race.deleted += 1;
