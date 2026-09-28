@@ -7,7 +7,6 @@ export async function GET() {
     { data: playLogs, error: playError },
     { data: detections, error: detectionError },
     { data: videos, error: videoError },
-    { data: participants, error: participantError },
   ] =
     await Promise.all([
       supabase
@@ -19,11 +18,17 @@ export async function GET() {
         .select("id, bib, video_id, screen_id, detected_time, outcome")
         .order("detected_time", { ascending: false }),
       supabase.from("event_video").select("id, bib, video_count, remark, approved, trash"),
-      supabase.from("event_participants").select("bib, race"),
     ]);
 
-  const error = playError || detectionError || videoError || participantError;
+  const error = playError || detectionError || videoError;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const videoBibs = [...new Set((videos || []).map((video) => String(video.bib).trim()))];
+  const { data: participants, error: participantError } = videoBibs.length
+    ? await supabase.from("event_participants").select("bib, race").in("bib", videoBibs)
+    : { data: [], error: null };
+
+  if (participantError) return NextResponse.json({ error: participantError.message }, { status: 500 });
 
   const videoById = new Map((videos || []).map((video) => [video.id, video]));
   const raceByBib = new Map(
