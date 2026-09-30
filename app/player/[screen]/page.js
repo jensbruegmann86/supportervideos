@@ -6,6 +6,13 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 // rendering it inside the 16:9 branded frame (backgrounds/bg_*_1080.png).
 // Fixed at the LED wall's native 1920x1080 resolution - no responsive
 // scaling, the browser showing this page is expected to run at that size.
+
+// Test screens: show a YouTube livestream instead of the idle placeholder
+// while no video is queued. Keyed by screen id.
+const IDLE_YOUTUBE_VIDEO_ID = {
+  90: "aX50wDkfBLM",
+};
+
 export default function PlayerPage({ params }) {
   const { screen } = use(params);
   const screenId = Number(screen) || 1;
@@ -59,6 +66,7 @@ export default function PlayerPage({ params }) {
 
   const clip = playlist[current];
   const bgFile = "bg_landscape_1080.png";
+  const idleYoutubeVideoId = IDLE_YOUTUBE_VIDEO_ID[screenId];
 
   return (
     <div style={styles.stage}>
@@ -77,6 +85,14 @@ export default function PlayerPage({ params }) {
             playsInline
             onEnded={handleEnded}
             style={styles.videoLandscape}
+          />
+        ) : idleYoutubeVideoId ? (
+          <iframe
+            key={idleYoutubeVideoId}
+            src={`https://www.youtube.com/embed/${idleYoutubeVideoId}?autoplay=1&mute=1&controls=0`}
+            style={styles.videoLandscape}
+            allow="autoplay; encrypted-media"
+            frameBorder="0"
           />
         ) : (
           <div style={styles.idle}>
