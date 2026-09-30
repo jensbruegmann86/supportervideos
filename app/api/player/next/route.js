@@ -50,7 +50,10 @@ export async function GET(request) {
     }
   }
   if (staleIds.length > 0) {
-    await supabase.from("video_play_log").update({ played: true, played_time: nowIso }).in("id", staleIds);
+    await supabase
+      .from("video_play_log")
+      .update({ played: true, played_time: nowIso, discard_reason: "stale" })
+      .in("id", staleIds);
   }
   if (!nextEntry) return NextResponse.json({ busy: false, playlist: [] });
 
@@ -95,7 +98,10 @@ export async function GET(request) {
     }
   }
   if (siblingStaleIds.length > 0) {
-    await supabase.from("video_play_log").update({ played: true, played_time: nowIso }).in("id", siblingStaleIds);
+    await supabase
+      .from("video_play_log")
+      .update({ played: true, played_time: nowIso, discard_reason: "stale" })
+      .in("id", siblingStaleIds);
   }
 
   const queueByVideoId = new Map(freshQueueEntries.map((q) => [q.video_id, q.id]));

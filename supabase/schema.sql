@@ -37,6 +37,7 @@ create table if not exists video_play_log (
   scheduled_time timestamptz not null default now(), -- earliest time this screen may play it
   played boolean not null default false,
   played_time timestamptz,
+  discard_reason text, -- e.g. 'stale' when skipped for being too old to still show
   unique (video_id, screen_id)
 );
 

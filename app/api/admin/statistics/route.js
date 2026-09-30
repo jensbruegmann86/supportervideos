@@ -11,7 +11,7 @@ export async function GET() {
     await Promise.all([
       supabase
         .from("video_play_log")
-        .select("id, video_id, screen_id, detected_time, scheduled_time, played, played_time")
+        .select("id, video_id, screen_id, detected_time, scheduled_time, played, played_time, discard_reason")
         .order("detected_time", { ascending: false }),
       supabase
         .from("video_detection_log")
@@ -62,7 +62,8 @@ export async function GET() {
     const playLog = playedByVideoId.get(detection.video_id);
     let status = "Nicht abgespielt";
     if (detection.outcome === "blocked") status = "Verworfen: Player belegt";
-    if (playLog?.played) status = "Abgespielt";
+    if (playLog?.discard_reason === "stale") status = "Verworfen: Screen belegt";
+    else if (playLog?.played) status = "Abgespielt";
     return {
       id: detection.id,
       bib: detection.bib,
