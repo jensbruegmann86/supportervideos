@@ -7,15 +7,19 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 // Fixed at the LED wall's native 1920x1080 resolution - no responsive
 // scaling, the browser showing this page is expected to run at that size.
 
-// Test screens: show a YouTube livestream instead of the idle placeholder
-// while no video is queued. Keyed by screen id.
-const IDLE_YOUTUBE_VIDEO_ID = {
-  90: "aX50wDkfBLM",
+// Test aliases: poll the same real screen's queue (identical webhook/data
+// flow) but show a YouTube livestream instead of the idle placeholder while
+// no video is queued, so the idle behaviour can be tried out without
+// affecting the production screen.
+const TEST_SCREEN_ALIASES = {
+  90: { realScreenId: 1, idleYoutubeVideoId: "aX50wDkfBLM" },
 };
 
 export default function PlayerPage({ params }) {
   const { screen } = use(params);
-  const screenId = Number(screen) || 1;
+  const screenParam = Number(screen) || 1;
+  const testAlias = TEST_SCREEN_ALIASES[screenParam];
+  const screenId = testAlias?.realScreenId ?? screenParam;
   const [playlist, setPlaylist] = useState([]);
   const [current, setCurrent] = useState(0);
   const [waiting, setWaiting] = useState(true);
@@ -66,7 +70,7 @@ export default function PlayerPage({ params }) {
 
   const clip = playlist[current];
   const bgFile = "bg_landscape_1080.png";
-  const idleYoutubeVideoId = IDLE_YOUTUBE_VIDEO_ID[screenId];
+  const idleYoutubeVideoId = testAlias?.idleYoutubeVideoId;
 
   return (
     <div style={styles.stage}>
