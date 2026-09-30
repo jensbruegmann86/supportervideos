@@ -3,28 +3,30 @@ import { useEffect, useState } from "react";
 import AdminNav from "./AdminNav";
 
 // Replaces dashboard.php / dashboard2.php / video_list.php.
+// Loads only one open video at a time to keep the page lightweight.
 export default function AdminPage() {
-  const [videos, setVideos] = useState([]);
-  const [status, setStatus] = useState("pending");
+  const [video, setVideo] = useState(null);
+  const [pendingCount, setPendingCount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [remarks, setRemarks] = useState({});
+  const [remark, setRemark] = useState("");
 
   async function load() {
     setLoading(true);
-    const res = await fetch(`/api/admin/videos?status=${status}`);
+    const res = await fetch("/api/admin/videos?status=pending&limit=1");
     const data = await res.json();
-    setVideos(data.videos || []);
+    const next = (data.videos || [])[0] || null;
+    setVideo(next);
+    setPendingCount(data.pendingCount ?? null);
+    setRemark(next?.remark || "");
     setLoading(false);
   }
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, []);
 
-  async function act(id, action) {
-    const remark = remarks[id];
-    await fetch(`/api/admin/videos/${id}`, {
+  async function act(action) {
+    await fetch(`/api/admin/videos/${video.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, remark }),
@@ -39,17 +41,21 @@ export default function AdminPage() {
         <AdminNav active="pending" />
       </div>
 
-      {loading && <p>Lädt...</p>}
-      {!loading && videos.length === 0 && <p>Keine Videos in dieser Ansicht.</p>}
+      {pendingCount !== null && (
+        <p className="text-muted">Noch freizugeben: <strong>{pendingCount}</strong></p>
+      )}
 
-      {videos.map((v) => (
-        <div className="card mb-3" key={v.id}>
+      {loading && <p>Lädt...</p>}
+      {!loading && !video && <p>Keine Videos in dieser Ansicht.</p>}
+
+      {!loading && video && (
+        <div className="card mb-3" key={video.id}>
           <div className="card-body">
             <h5 className="card-title">
-              BIB: {v.bib} | Video #: {v.video_count} | Freigabe: {v.approved ? "Ja" : "Nein"}
+              BIB: {video.bib} | Video #: {video.video_count} | Freigabe: {video.approved ? "Ja" : "Nein"}
             </h5>
-            {v.video_url ? (
-              <video width="320" height="568" controls src={v.video_url} />
+            {video.video_url ? (
+              <video width="320" height="568" controls src={video.video_url} />
             ) : (
               <p className="text-danger">Video nicht gefunden!</p>
             )}
@@ -58,28 +64,24 @@ export default function AdminPage() {
               <textarea
                 className="form-control"
                 rows={2}
-                defaultValue={v.remark || ""}
-                onChange={(e) => setRemarks((r) => ({ ...r, [v.id]: e.target.value }))}
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
               />
             </div>
-            {!v.approved && (
-              <>
-                <button className="btn btn-success me-2" onClick={() => act(v.id, "accept")}>
-                  Freigeben
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    if (confirm("Video wirklich löschen?")) act(v.id, "delete");
-                  }}
-                >
-                  Löschen
-                </button>
-              </>
-            )}
+            <button className="btn btn-success me-2" onClick={() => act("accept")}>
+              Freigeben
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => {
+                if (confirm("Video wirklich löschen?")) act("delete");
+              }}
+            >
+              Löschen
+            </button>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
