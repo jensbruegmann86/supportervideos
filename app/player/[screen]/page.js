@@ -27,7 +27,9 @@ export default function PlayerPage({ params }) {
   const [participant, setParticipant] = useState(null);
   const [showingIntro, setShowingIntro] = useState(false);
   const [idleYoutubeVideoId, setIdleYoutubeVideoId] = useState("");
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const videoRef = useRef(null);
+  const iframeRef = useRef(null);
   const pollRef = useRef(null);
 
   useEffect(() => {
@@ -90,6 +92,16 @@ export default function PlayerPage({ params }) {
 
   const clip = playlist[current];
   const bgFile = "bg_landscape_1080.png";
+  const isIdleLive = idleYoutubeVideoId && !showingIntro && !clip;
+
+  // Tell the already-loaded YouTube player to mute/unmute instead of
+  // recreating the iframe, so a single click keeps working across idle cycles.
+  useEffect(() => {
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    const command = isIdleLive && audioUnlocked ? "unMute" : "mute";
+    win.postMessage(JSON.stringify({ event: "command", func: command, args: [] }), "*");
+  }, [isIdleLive, audioUnlocked]);
 
   return (
     <div style={styles.stage}>
@@ -99,6 +111,29 @@ export default function PlayerPage({ params }) {
           backgroundImage: `url(/backgrounds/${bgFile})`,
         }}
       >
+        {idleYoutubeVideoId && (
+          <div
+            style={{
+              ...styles.videoLandscape,
+              opacity: isIdleLive ? 1 : 0,
+              pointerEvents: isIdleLive ? "auto" : "none",
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              title="idle-livestream"
+              src={`https://www.youtube.com/embed/${idleYoutubeVideoId}?autoplay=1&mute=1&controls=0&enablejsapi=1&playsinline=1`}
+              style={{ width: "100%", height: "100%", border: 0 }}
+              allow="autoplay; encrypted-media"
+            />
+            {isIdleLive && !audioUnlocked && (
+              <button style={styles.unmuteButton} onClick={() => setAudioUnlocked(true)}>
+                🔊 Ton aktivieren
+              </button>
+            )}
+          </div>
+        )}
+
         {showingIntro && participant ? (
           <div style={styles.intro}>
             <p style={styles.introName}>
@@ -116,15 +151,7 @@ export default function PlayerPage({ params }) {
             onEnded={handleEnded}
             style={styles.videoLandscape}
           />
-        ) : idleYoutubeVideoId ? (
-          <iframe
-            key={idleYoutubeVideoId}
-            src={`https://www.youtube.com/embed/${idleYoutubeVideoId}?autoplay=1&mute=1&controls=0`}
-            style={styles.videoLandscape}
-            allow="autoplay; encrypted-media"
-            frameBorder="0"
-          />
-        ) : (
+        ) : !idleYoutubeVideoId ? (
           <div style={styles.idle}>
             <div style={styles.idleCard}>
               <div style={styles.idlePulse} />
@@ -132,7 +159,7 @@ export default function PlayerPage({ params }) {
               <p style={styles.idleSubtitle}>Screen {screenId} wartet auf den nächsten Zieleinlauf...</p>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -161,6 +188,19 @@ const styles = {
     width: "1436px",
     height: "807px",
     objectFit: "cover",
+  },
+  unmuteButton: {
+    position: "absolute",
+    right: "24px",
+    bottom: "24px",
+    padding: "16px 28px",
+    fontSize: "1.2rem",
+    fontWeight: 700,
+    color: "#fff",
+    background: "#c8102e",
+    border: "none",
+    borderRadius: "12px",
+    cursor: "pointer",
   },
   intro: {
     position: "absolute",
