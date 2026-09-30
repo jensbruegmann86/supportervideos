@@ -86,10 +86,23 @@ export async function GET(request) {
     return NextResponse.json({ busy: false, playlist: [] });
   }
 
+  const { data: participant } = await supabase
+    .from("event_participants")
+    .select("bib, name, surname")
+    .eq("bib", firstVideo.bib)
+    .maybeSingle();
+
   await supabase
     .from("player_state")
     .update({ busy: true, updated_at: nowIso })
     .eq("screen_id", screenId);
 
-  return NextResponse.json({ busy: false, bib: firstVideo.bib, playlist });
+  return NextResponse.json({
+    busy: false,
+    bib: firstVideo.bib,
+    participant: participant
+      ? { bib: participant.bib, name: participant.name, surname: participant.surname }
+      : null,
+    playlist,
+  });
 }

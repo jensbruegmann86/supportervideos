@@ -23,6 +23,8 @@ export default function PlayerPage({ params }) {
   const [playlist, setPlaylist] = useState([]);
   const [current, setCurrent] = useState(0);
   const [waiting, setWaiting] = useState(true);
+  const [participant, setParticipant] = useState(null);
+  const [showingIntro, setShowingIntro] = useState(false);
   const videoRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -33,6 +35,8 @@ export default function PlayerPage({ params }) {
       if (data.playlist && data.playlist.length > 0) {
         setPlaylist(data.playlist);
         setCurrent(0);
+        setParticipant(data.participant || null);
+        setShowingIntro(true);
         setWaiting(false);
       }
     } catch {
@@ -46,6 +50,12 @@ export default function PlayerPage({ params }) {
     }, 1000);
     return () => clearInterval(pollRef.current);
   }, [waiting, poll]);
+
+  useEffect(() => {
+    if (!showingIntro) return;
+    const timer = setTimeout(() => setShowingIntro(false), 3000);
+    return () => clearTimeout(timer);
+  }, [showingIntro]);
 
   async function release(playLogId, isLast) {
     await fetch("/api/player/release", {
@@ -80,7 +90,14 @@ export default function PlayerPage({ params }) {
           backgroundImage: `url(/backgrounds/${bgFile})`,
         }}
       >
-        {clip ? (
+        {showingIntro && participant ? (
+          <div style={styles.intro}>
+            <p style={styles.introName}>
+              {participant.surname} {participant.name}
+            </p>
+            <p style={styles.introBib}>{participant.bib}</p>
+          </div>
+        ) : clip ? (
           <video
             ref={videoRef}
             key={clip.playLogId}
@@ -135,6 +152,30 @@ const styles = {
     width: "1436px",
     height: "807px",
     objectFit: "cover",
+  },
+  intro: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: "1436px",
+    height: "807px",
+    background: "#fff",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "sans-serif",
+    color: "#000",
+    textAlign: "center",
+  },
+  introName: {
+    margin: 0,
+    fontSize: "3rem",
+    fontWeight: 700,
+  },
+  introBib: {
+    margin: "16px 0 0",
+    fontSize: "2rem",
   },
   idle: {
     position: "absolute",
