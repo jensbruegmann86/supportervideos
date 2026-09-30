@@ -35,58 +35,58 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Video Management Dashboard</h2>
+    <div className="container-fluid p-3 d-flex flex-column" style={{ height: "100dvh" }}>
+      <div className="d-flex justify-content-between align-items-center mb-2 flex-shrink-0">
+        <h2 className="h4 mb-0">Video Management Dashboard</h2>
         <AdminNav active="pending" />
       </div>
 
       {pendingCount !== null && (
-        <p className="text-muted">Noch freizugeben: <strong>{pendingCount}</strong></p>
+        <p className="text-muted mb-2 flex-shrink-0">Noch freizugeben: <strong>{pendingCount}</strong></p>
       )}
 
       {loading && <p>Lädt...</p>}
       {!loading && !video && <p>Keine Videos in dieser Ansicht.</p>}
 
       {!loading && video && (
-        <div className="card mb-3" key={video.id}>
-          <div className="card-body">
-            <h5 className="card-title">
+        <div className="card flex-grow-1 d-flex flex-column" key={video.id} style={{ minHeight: 0 }}>
+          <div className="card-body d-flex flex-column flex-grow-1" style={{ minHeight: 0 }}>
+            <h5 className="card-title flex-shrink-0">
               BIB: {video.bib} | Video #: {video.video_count} | Freigabe: {video.approved ? "Ja" : "Nein"}
             </h5>
-            {video.video_url ? (
-              <video
-                controls
-                src={video.video_url}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "70vh",
-                  aspectRatio: video.orientation === 1 ? "9 / 16" : "16 / 9",
-                }}
-              />
-            ) : (
-              <p className="text-danger">Video nicht gefunden!</p>
-            )}
-            <div className="mb-2 mt-2">
+            <div className="d-flex justify-content-center flex-grow-1" style={{ minHeight: 0 }}>
+              {video.video_url ? (
+                <video
+                  controls
+                  src={video.video_url}
+                  style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+                />
+              ) : (
+                <p className="text-danger">Video nicht gefunden!</p>
+              )}
+            </div>
+            <div className="mb-2 mt-2 flex-shrink-0">
               <label className="form-label">Bemerkung</label>
               <textarea
                 className="form-control"
-                rows={2}
+                rows={1}
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
               />
             </div>
-            <button className="btn btn-success me-2" onClick={() => act("accept")}>
-              Freigeben
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => {
-                if (confirm("Video wirklich löschen?")) act("delete");
-              }}
-            >
-              Löschen
-            </button>
+            <div className="flex-shrink-0">
+              <button className="btn btn-success me-2" onClick={() => act("accept")}>
+                Freigeben
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  if (confirm("Video wirklich löschen?")) act("delete");
+                }}
+              >
+                Löschen
+              </button>
+            </div>
           </div>
         </div>
       )}
