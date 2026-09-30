@@ -5,6 +5,11 @@ import { supabaseAdmin, VIDEO_BUCKET } from "../../../../lib/supabaseAdmin";
 // Polled by the player page. Replaces player.php / player3-6.php.
 // Hands out one runner's approved videos as a playlist and marks the screen
 // as busy until the release endpoint frees it again.
+
+// Queue entries older than this (since detection) are skipped instead of
+// played late - avoids a backlog of stale detections playing back-to-back.
+const STALE_AFTER_MS = 20_000;
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const screenId = Number(searchParams.get("screen_id") || 1);
@@ -20,18 +25,33 @@ export async function GET(request) {
     return NextResponse.json({ busy: true, playlist: [] });
   }
 
-  const nowIso = new Date().toISOString();
-  const { data: nextEntry, error: qErr } = await supabase
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const isStale = (detectedTime) => now.getTime() - new Date(detectedTime).getTime() > STALE_AFTER_MS;
+
+  const { data: candidateEntries, error: qErr } = await supabase
     .from("video_play_log")
-    .select("id, video_id, scheduled_time")
+    .select("id, video_id, scheduled_time, detected_time")
     .eq("screen_id", screenId)
     .eq("played", false)
     .lte("scheduled_time", nowIso)
     .order("scheduled_time", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .limit(50);
 
   if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
+
+  let nextEntry = null;
+  const staleIds = [];
+  for (const entry of candidateEntries || []) {
+    if (isStale(entry.detected_time)) {
+      staleIds.push(entry.id);
+    } else if (!nextEntry) {
+      nextEntry = entry;
+    }
+  }
+  if (staleIds.length > 0) {
+    await supabase.from("video_play_log").update({ played: true, played_time: nowIso }).in("id", staleIds);
+  }
   if (!nextEntry) return NextResponse.json({ busy: false, playlist: [] });
 
   const { data: firstVideo } = await supabase
@@ -59,13 +79,26 @@ export async function GET(request) {
   const videoIds = (bibVideos || []).map((v) => v.id);
   const { data: queueEntries } = await supabase
     .from("video_play_log")
-    .select("id, video_id")
+    .select("id, video_id, detected_time")
     .eq("screen_id", screenId)
     .eq("played", false)
     .lte("scheduled_time", nowIso)
     .in("video_id", videoIds);
 
-  const queueByVideoId = new Map((queueEntries || []).map((q) => [q.video_id, q.id]));
+  const freshQueueEntries = [];
+  const siblingStaleIds = [];
+  for (const entry of queueEntries || []) {
+    if (isStale(entry.detected_time)) {
+      siblingStaleIds.push(entry.id);
+    } else {
+      freshQueueEntries.push(entry);
+    }
+  }
+  if (siblingStaleIds.length > 0) {
+    await supabase.from("video_play_log").update({ played: true, played_time: nowIso }).in("id", siblingStaleIds);
+  }
+
+  const queueByVideoId = new Map(freshQueueEntries.map((q) => [q.video_id, q.id]));
 
   const playlist = [];
   for (const v of bibVideos || []) {
