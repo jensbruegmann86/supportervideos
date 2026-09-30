@@ -10,6 +10,7 @@ export default function AdminNav({ active }) {
     { key: "pending", label: "Offen", href: "/admin" },
     { key: "approved", label: "Freigegeben", href: "/admin/approved" },
     { key: "statistics", label: "Statistik", href: "/admin/statistics" },
+    { key: "settings", label: "Einstellungen", href: "/admin/settings" },
   ];
 
   return (

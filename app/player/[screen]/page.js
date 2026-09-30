@@ -10,9 +10,10 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 // Test aliases: poll the same real screen's queue (identical webhook/data
 // flow) but show a YouTube livestream instead of the idle placeholder while
 // no video is queued, so the idle behaviour can be tried out without
-// affecting the production screen.
+// affecting the production screen. The video itself is configured in
+// /admin/settings, not hardcoded here.
 const TEST_SCREEN_ALIASES = {
-  90: { realScreenId: 1, idleYoutubeVideoId: "aX50wDkfBLM" },
+  90: { realScreenId: 1 },
 };
 
 export default function PlayerPage({ params }) {
@@ -25,8 +26,17 @@ export default function PlayerPage({ params }) {
   const [waiting, setWaiting] = useState(true);
   const [participant, setParticipant] = useState(null);
   const [showingIntro, setShowingIntro] = useState(false);
+  const [idleYoutubeVideoId, setIdleYoutubeVideoId] = useState("");
   const videoRef = useRef(null);
   const pollRef = useRef(null);
+
+  useEffect(() => {
+    if (!testAlias) return;
+    fetch("/api/player/settings", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => setIdleYoutubeVideoId(data.idleYoutubeVideoId || ""))
+      .catch(() => {});
+  }, [testAlias]);
 
   const poll = useCallback(async () => {
     try {
@@ -80,7 +90,6 @@ export default function PlayerPage({ params }) {
 
   const clip = playlist[current];
   const bgFile = "bg_landscape_1080.png";
-  const idleYoutubeVideoId = testAlias?.idleYoutubeVideoId;
 
   return (
     <div style={styles.stage}>
@@ -93,7 +102,7 @@ export default function PlayerPage({ params }) {
         {showingIntro && participant ? (
           <div style={styles.intro}>
             <p style={styles.introName}>
-              {participant.surname} {participant.name}
+              {participant.name} {participant.surname}
             </p>
             <p style={styles.introBib}>{participant.bib}</p>
           </div>
@@ -170,12 +179,12 @@ const styles = {
   },
   introName: {
     margin: 0,
-    fontSize: "3rem",
+    fontSize: "6rem",
     fontWeight: 700,
   },
   introBib: {
     margin: "16px 0 0",
-    fontSize: "2rem",
+    fontSize: "4rem",
   },
   idle: {
     position: "absolute",
