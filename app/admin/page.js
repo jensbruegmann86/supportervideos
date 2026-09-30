@@ -55,7 +55,15 @@ export default function AdminPage() {
               BIB: {video.bib} | Video #: {video.video_count} | Freigabe: {video.approved ? "Ja" : "Nein"}
             </h5>
             {video.video_url ? (
-              <video width="320" height="568" controls src={video.video_url} />
+              <video
+                controls
+                src={video.video_url}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "70vh",
+                  aspectRatio: video.orientation === 1 ? "9 / 16" : "16 / 9",
+                }}
+              />
             ) : (
               <p className="text-danger">Video nicht gefunden!</p>
             )}
