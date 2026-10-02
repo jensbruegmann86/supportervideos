@@ -38,11 +38,17 @@ export async function GET() {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const videoBibs = [...new Set((videos || []).map((video) => String(video.bib).trim()))];
-  const { data: participants, error: participantError } = videoBibs.length
-    ? await supabase.from("event_participants").select("bib, name, surname, race").in("bib", videoBibs)
-    : { data: [], error: null };
-
+  const participantResults = await Promise.all(
+    Array.from({ length: Math.ceil(videoBibs.length / 500) }, (_, index) =>
+      supabase
+        .from("event_participants")
+        .select("bib, name, surname, race")
+        .in("bib", videoBibs.slice(index * 500, (index + 1) * 500))
+    )
+  );
+  const participantError = participantResults.find(({ error: queryError }) => queryError)?.error;
   if (participantError) return NextResponse.json({ error: participantError.message }, { status: 500 });
+  const participants = participantResults.flatMap(({ data }) => data || []);
 
   const videoById = new Map((videos || []).map((video) => [video.id, video]));
   const raceByBib = new Map(
@@ -67,9 +73,11 @@ export async function GET() {
   }
 
   const uploadsByBib = new Map();
+  const approvedUploadBibs = new Set();
   for (const video of videos || []) {
     const bib = String(video.bib).trim();
     uploadsByBib.set(bib, (uploadsByBib.get(bib) || 0) + 1);
+    if (video.approved && !video.trash) approvedUploadBibs.add(bib);
   }
   const participantsMoreThanTwoVideos = [...uploadsByBib.entries()]
     .filter(([, count]) => count > 2)
@@ -89,6 +97,7 @@ export async function GET() {
     deleted: (videos || []).filter((video) => video.trash).length,
     pending: (videos || []).filter((video) => !video.approved && !video.trash).length,
     participantsWithVideos: uploadsByBib.size,
+    participantsWithApprovedVideos: approvedUploadBibs.size,
     participantsMoreThanTwoVideos,
     race: raceStats,
   };
@@ -98,7 +107,8 @@ export async function GET() {
     const playLog = playedByVideoId.get(detection.video_id);
     let status = "Nicht abgespielt";
     if (detection.outcome === "blocked") status = "Verworfen: Player belegt";
-    if (playLog?.discard_reason === "stale") status = "Verworfen: Screen belegt";
+    else if (playLog?.discard_reason === "stale") status = "Verworfen: Screen belegt";
+    else if (playLog?.discard_reason === "video_limit") status = "Übersprungen: Limit 3 Videos";
     else if (playLog?.played) status = "Abgespielt";
     return {
       id: detection.id,

@@ -79,7 +79,36 @@ export async function GET(request) {
     .eq("orientation", 2)
     .order("video_count", { ascending: true });
 
-  const videoIds = (bibVideos || []).map((v) => v.id);
+  const eligibleVideos = (bibVideos || []).slice(0, 3);
+  const eligibleVideoIds = new Set(eligibleVideos.map((video) => video.id));
+  const excessVideoIds = (bibVideos || []).slice(3).map((video) => video.id);
+
+  if (excessVideoIds.length > 0) {
+    const { data: excessQueueEntries } = await supabase
+      .from("video_play_log")
+      .select("id")
+      .eq("screen_id", screenId)
+      .eq("played", false)
+      .in("video_id", excessVideoIds);
+
+    const excessQueueIds = (excessQueueEntries || []).map((entry) => entry.id);
+    if (excessQueueIds.length > 0) {
+      await supabase
+        .from("video_play_log")
+        .update({ played: true, played_time: nowIso, discard_reason: "video_limit" })
+        .in("id", excessQueueIds);
+    }
+  }
+
+  if (!eligibleVideoIds.has(firstVideo.id)) {
+    await supabase
+      .from("video_play_log")
+      .update({ played: true, played_time: nowIso, discard_reason: "video_limit" })
+      .eq("id", nextEntry.id);
+    return NextResponse.json({ busy: false, playlist: [] });
+  }
+
+  const videoIds = eligibleVideos.map((video) => video.id);
   const { data: queueEntries } = await supabase
     .from("video_play_log")
     .select("id, video_id, detected_time")
@@ -107,7 +136,7 @@ export async function GET(request) {
   const queueByVideoId = new Map(freshQueueEntries.map((q) => [q.video_id, q.id]));
 
   const playlist = [];
-  for (const v of bibVideos || []) {
+  for (const v of eligibleVideos) {
     const playLogId = queueByVideoId.get(v.id);
     if (!playLogId || !v.storage_path) continue;
     const { data: signed } = await supabase.storage

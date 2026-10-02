@@ -22,10 +22,13 @@ export async function GET(request) {
   const supabase = supabaseAdmin();
   const { data: videos, error } = await supabase
     .from("event_video")
-    .select("id")
+    .select("id, video_count")
     .eq("bib", bib)
     .eq("approved", true)
-    .eq("trash", false);
+    .eq("trash", false)
+    .eq("orientation", 2)
+    .order("video_count", { ascending: true })
+    .limit(3);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!videos || videos.length === 0) {

@@ -36,6 +36,7 @@ export default function StatisticsPage() {
               ["Gelöscht", summary.deleted, "text-danger"],
               ["Offen", summary.pending, ""],
               ["Teilnehmer mit Uploads", summary.participantsWithVideos, ""],
+              ["Teilnehmer mit freigegebenen Videos", summary.participantsWithApprovedVideos, "text-success"],
               ["Teilnehmer mit mehr als 2 Videos", summary.participantsMoreThanTwoVideos.length, ""],
             ].map(([label, value, valueClass]) => (
               <div className="col-sm-6 col-lg-3" key={label}>
