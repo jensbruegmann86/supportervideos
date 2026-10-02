@@ -35,6 +35,8 @@ export default function StatisticsPage() {
               ["Freigegeben", summary.approved, "text-success"],
               ["Gelöscht", summary.deleted, "text-danger"],
               ["Offen", summary.pending, ""],
+              ["Teilnehmer mit Uploads", summary.participantsWithVideos, ""],
+              ["Teilnehmer mit mehr als 2 Videos", summary.participantsMoreThanTwoVideos.length, ""],
             ].map(([label, value, valueClass]) => (
               <div className="col-sm-6 col-lg-3" key={label}>
                 <div className="card h-100">
@@ -46,6 +48,27 @@ export default function StatisticsPage() {
               </div>
             ))}
           </div>
+          {summary.participantsMoreThanTwoVideos.length > 0 && (
+            <>
+              <h4>Teilnehmer mit mehr als 2 Videos</h4>
+              <div className="table-responsive mb-4">
+                <table className="table table-bordered table-striped align-middle">
+                  <thead>
+                    <tr><th>Startnummer</th><th>Teilnehmer</th><th>Videos hochgeladen</th></tr>
+                  </thead>
+                  <tbody>
+                    {summary.participantsMoreThanTwoVideos.map((participant) => (
+                      <tr key={participant.bib}>
+                        <td>{participant.bib}</td>
+                        <td>{participant.name || "-"}</td>
+                        <td>{participant.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
           <h4>Verteilung nach Strecke</h4>
           <div className="table-responsive mb-4">
             <table className="table table-bordered align-middle">
