@@ -14,6 +14,7 @@ export default function VideoSequence({ videos }) {
   const [nativeFull, setNativeFull] = useState(false);
   const [pseudoFull, setPseudoFull] = useState(false);
   const [portrait, setPortrait] = useState(false);
+  const [nextReady, setNextReady] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const playNextRef = useRef(false);
@@ -81,6 +82,13 @@ export default function VideoSequence({ videos }) {
     }
   }
 
+  // Start fetching the next clip only once this one is fully buffered, so they don't compete for bandwidth.
+  function checkBuffered() {
+    const video = videoRef.current;
+    if (!video || !video.duration || video.buffered.length === 0) return;
+    if (video.buffered.end(video.buffered.length - 1) >= video.duration - 0.5) setNextReady(true);
+  }
+
   function handleEnded() {
     if (index < videos.length - 1) {
       playNextRef.current = true;
@@ -124,11 +132,14 @@ export default function VideoSequence({ videos }) {
             ref={videoRef}
             controls
             playsInline
-            preload="metadata"
+            preload="auto"
             controlsList="nofullscreen"
             disablePictureInPicture
             src={videos[index].url}
             onEnded={handleEnded}
+            onLoadStart={() => setNextReady(false)}
+            onProgress={checkBuffered}
+            onCanPlayThrough={checkBuffered}
             style={{
               position: "absolute",
               left: 0,
@@ -140,6 +151,10 @@ export default function VideoSequence({ videos }) {
             }}
           />
         </div>
+
+        {nextReady && videos[index + 1] && (
+          <video src={videos[index + 1].url} preload="auto" muted playsInline style={{ display: "none" }} />
+        )}
 
         {full && (
           <button
