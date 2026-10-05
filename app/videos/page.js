@@ -1,4 +1,5 @@
 import { supabaseAdmin, VIDEO_BUCKET } from "../../lib/supabaseAdmin";
+import { isValidVideoLinkCode } from "../../lib/videoLink.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -43,34 +44,27 @@ async function loadVideos(bib) {
 
 export default async function VideosPage({ searchParams }) {
   const params = await searchParams;
-  const rawBib = Array.isArray(params?.bib) ? params.bib[0] : params?.bib;
-  const bib = String(rawBib || "").trim().slice(0, 20);
+  const first = (value) => String((Array.isArray(value) ? value[0] : value) || "").trim();
+  const bib = first(params?.bib).slice(0, 20);
+  const authorized = bib !== "" && isValidVideoLinkCode(bib, first(params?.code));
 
-  const result = bib ? await loadVideos(bib) : null;
+  const result = authorized ? await loadVideos(bib) : null;
 
   return (
     <div className="container py-4" style={{ maxWidth: 1000 }}>
       <h3 className="mb-1">Deine Supportervideos</h3>
 
-      {!bib && (
-        <form method="get" action="/videos" className="mt-3 d-flex gap-2" style={{ maxWidth: 420 }}>
-          <input
-            className="form-control"
-            name="bib"
-            inputMode="numeric"
-            placeholder="Startnummer"
-            aria-label="Startnummer"
-            required
-          />
-          <button className="btn btn-gkm" type="submit">Anzeigen</button>
-        </form>
+      {!authorized && (
+        <p className="mt-3">
+          Dieser Link ist ungültig oder unvollständig. Bitte verwende den Link aus deiner E-Mail.
+        </p>
       )}
 
-      {bib && result?.failed && (
+      {authorized && result?.failed && (
         <p className="mt-3 text-danger">Die Videos konnten gerade nicht geladen werden. Bitte versuche es später erneut.</p>
       )}
 
-      {bib && result && !result.failed && (
+      {authorized && result && !result.failed && (
         <>
           <p className="text-muted">
             {result.participant?.name ? `${result.participant.name} | ` : ""}Startnummer {bib}
