@@ -80,22 +80,41 @@ export async function GET() {
 
   const rows = buildDetectionRows(detections, playLogs, videos);
 
+  // Each participant with an approved video lands in exactly one group.
+  const activityByBib = new Map();
+  for (const row of rows) {
+    const bib = String(row.bib).trim();
+    const entry = activityByBib.get(bib) || { playedVideos: new Set(), discarded: false };
+    if (row.status === STATUS_PLAYED) entry.playedVideos.add(row.videoCount);
+    else if (row.status === STATUS_DISCARDED) entry.discarded = true;
+    activityByBib.set(bib, entry);
+  }
+  const participantOverview = {
+    noDetection: 0,
+    playedOne: 0,
+    playedTwo: 0,
+    playedThree: 0,
+    discarded: 0,
+    detectedNotPlayed: 0,
+  };
+  for (const bib of approvedUploadBibs) {
+    const entry = activityByBib.get(bib);
+    if (!entry) participantOverview.noDetection += 1;
+    else if (entry.playedVideos.size === 1) participantOverview.playedOne += 1;
+    else if (entry.playedVideos.size === 2) participantOverview.playedTwo += 1;
+    else if (entry.playedVideos.size >= 3) participantOverview.playedThree += 1;
+    else if (entry.discarded) participantOverview.discarded += 1;
+    else participantOverview.detectedNotPlayed += 1;
+  }
+
   const summary = {
     total: (videos || []).length,
     approved: (videos || []).filter((video) => video.approved && !video.trash).length,
     deleted: (videos || []).filter((video) => video.trash).length,
     pending: (videos || []).filter((video) => !video.approved && !video.trash).length,
-    participantsWithVideos: uploadsByBib.size,
     participantsWithApprovedVideos: approvedUploadBibs.size,
     participantsMoreThanTwoVideos,
-    playedVideos: rows.filter((row) => row.status === STATUS_PLAYED).length,
-    discardedVideos: rows.filter((row) => row.status === STATUS_DISCARDED).length,
-    participantsPlayed: new Set(
-      rows.filter((row) => row.status === STATUS_PLAYED).map((row) => String(row.bib).trim())
-    ).size,
-    participantsDiscarded: new Set(
-      rows.filter((row) => row.status === STATUS_DISCARDED).map((row) => String(row.bib).trim())
-    ).size,
+    participantOverview,
     race: raceStats,
   };
 

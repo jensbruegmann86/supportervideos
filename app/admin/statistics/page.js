@@ -145,13 +145,8 @@ export default function StatisticsPage() {
               ["Freigegeben", summary.approved, "text-success"],
               ["Gelöscht", summary.deleted, "text-danger"],
               ["Offen", summary.pending, ""],
-              ["Teilnehmer mit Uploads", summary.participantsWithVideos, ""],
               ["Teilnehmer mit freigegebenen Videos", summary.participantsWithApprovedVideos, "text-success"],
               ["Teilnehmer mit mehr als 2 Videos", summary.participantsMoreThanTwoVideos.length, ""],
-              ["Abgespielte Videos", summary.playedVideos, "text-success"],
-              ["Verworfen (Screen belegt)", summary.discardedVideos, "text-danger"],
-              ["Teilnehmer mit abgespieltem Video", summary.participantsPlayed, "text-success"],
-              ["Teilnehmer verworfen (Screen belegt)", summary.participantsDiscarded, "text-danger"],
             ].map(([label, value, valueClass]) => (
               <div className="col-sm-6 col-lg-3" key={label}>
                 <div className="card h-100">
@@ -162,6 +157,35 @@ export default function StatisticsPage() {
                 </div>
               </div>
             ))}
+          </div>
+          <h4>Übersicht Teilnehmer mit freigegebenen Videos</h4>
+          <div className="table-responsive mb-4">
+            <table className="table table-bordered align-middle">
+              <thead>
+                <tr><th>Gruppe</th><th>Teilnehmer</th></tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Keine Detektion", summary.participantOverview.noDetection],
+                  ["Ein Video abgespielt", summary.participantOverview.playedOne],
+                  ["Zwei Videos abgespielt", summary.participantOverview.playedTwo],
+                  ["Drei Videos abgespielt", summary.participantOverview.playedThree],
+                  ["Video verworfen (Screen belegt)", summary.participantOverview.discarded],
+                  ["Detektiert, aber nicht abgespielt", summary.participantOverview.detectedNotPlayed],
+                ].map(([label, value]) => (
+                  <tr key={label}>
+                    <td>{label}</td>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="fw-bold">
+                  <td>Summe</td>
+                  <td>{Object.values(summary.participantOverview).reduce((a, b) => a + b, 0)}</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
           <h4>Detektionen im Zeitverlauf</h4>
           <div className="mb-4">
