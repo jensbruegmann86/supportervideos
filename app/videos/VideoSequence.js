@@ -98,7 +98,7 @@ export default function VideoSequence({ videos }) {
   const wrapperStyle = full
     ? {
         ...(pseudoFull ? { position: "fixed", inset: 0, zIndex: 1000 } : { width: "100%", height: "100%" }),
-        background: "#000",
+        background: "#fff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
