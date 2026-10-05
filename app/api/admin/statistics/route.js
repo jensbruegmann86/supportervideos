@@ -1,38 +1,30 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
-import { getBibsWithoutDetection } from "../../../../lib/missingDetections";
-
-async function getAllVideos(supabase) {
-  const pageSize = 1000;
-  const videos = [];
-
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await supabase
-      .from("event_video")
-      .select("id, bib, video_count, remark, approved, trash")
-      .order("id", { ascending: true })
-      .range(from, from + pageSize - 1);
-
-    if (error) return { data: null, error };
-    videos.push(...(data || []));
-    if (!data || data.length < pageSize) break;
-  }
-
-  return { data: videos, error: null };
-}
+import { fetchAll, getBibsWithoutDetection } from "../../../../lib/missingDetections";
 
 export async function GET() {
   const supabase = supabaseAdmin();
   const [{ data: playLogs, error: playError }, { data: detections, error: detectionError }, { data: videos, error: videoError }] = await Promise.all([
-      supabase
-        .from("video_play_log")
-        .select("id, video_id, screen_id, detected_time, scheduled_time, played, played_time, discard_reason")
-        .order("detected_time", { ascending: false }),
-      supabase
-        .from("video_detection_log")
-        .select("id, bib, video_id, screen_id, detected_time, outcome")
-        .order("detected_time", { ascending: false }),
-      getAllVideos(supabase),
+      fetchAll(() =>
+        supabase
+          .from("video_play_log")
+          .select("id, video_id, screen_id, detected_time, scheduled_time, played, played_time, discard_reason")
+          .order("detected_time", { ascending: false })
+          .order("id", { ascending: false })
+      ),
+      fetchAll(() =>
+        supabase
+          .from("video_detection_log")
+          .select("id, bib, video_id, screen_id, detected_time, outcome")
+          .order("detected_time", { ascending: false })
+          .order("id", { ascending: false })
+      ),
+      fetchAll(() =>
+        supabase
+          .from("event_video")
+          .select("id, bib, video_count, remark, approved, trash")
+          .order("id", { ascending: true })
+      ),
     ]);
 
   const error = playError || detectionError || videoError;
