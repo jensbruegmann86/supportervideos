@@ -6,9 +6,79 @@ function formatDate(value) {
   return value ? new Date(value).toLocaleString("de-DE") : "-";
 }
 
+const CHART_HEIGHT = 200;
+const SERIES = [
+  { key: "played", label: "Abgespielt", color: "#198754" },
+  { key: "discarded", label: "Verworfen: Screen belegt", color: "#dc3545" },
+  { key: "other", label: "Sonstige", color: "#adb5bd" },
+];
+
+function DetectionChart({ timeline }) {
+  const { buckets, bucketMinutes } = timeline;
+  if (!buckets || buckets.length === 0) return <p>Noch keine Detektionen vorhanden.</p>;
+
+  const maxTotal = Math.max(...buckets.map((b) => b.played + b.discarded + b.other), 1);
+  const showDate = bucketMinutes >= 60;
+
+  return (
+    <>
+      <div className="d-flex flex-wrap gap-3 mb-2">
+        {SERIES.map((series) => (
+          <span key={series.key} className="small">
+            <span
+              style={{ display: "inline-block", width: 12, height: 12, background: series.color, marginRight: 6 }}
+            />
+            {series.label}
+          </span>
+        ))}
+        <span className="small text-muted">Intervall: {bucketMinutes} Min.</span>
+      </div>
+      <div style={{ overflowX: "auto" }}>
+        <div
+          className="d-flex align-items-end"
+          style={{ height: CHART_HEIGHT, minWidth: buckets.length * 14, borderBottom: "1px solid #dee2e6" }}
+        >
+          {buckets.map((bucket) => {
+            const total = bucket.played + bucket.discarded + bucket.other;
+            const start = new Date(bucket.time).toLocaleString("de-DE", {
+              ...(showDate ? { day: "2-digit", month: "2-digit" } : {}),
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return (
+              <div
+                key={bucket.time}
+                title={`${start}: ${total} Detektionen (${bucket.played} abgespielt, ${bucket.discarded} verworfen, ${bucket.other} sonstige)`}
+                style={{ flex: "1 0 12px", margin: "0 1px", display: "flex", flexDirection: "column-reverse" }}
+              >
+                {SERIES.map((series) =>
+                  bucket[series.key] > 0 ? (
+                    <div
+                      key={series.key}
+                      style={{
+                        height: (bucket[series.key] / maxTotal) * (CHART_HEIGHT - 4),
+                        background: series.color,
+                      }}
+                    />
+                  ) : null
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="d-flex justify-content-between small text-muted mt-1" style={{ minWidth: buckets.length * 14 }}>
+          <span>{formatDate(buckets[0].time)}</span>
+          <span>max. {maxTotal} pro Intervall</span>
+          <span>{formatDate(buckets[buckets.length - 1].time)}</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function StatisticsPage() {
-  const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [timeline, setTimeline] = useState(null);
   const [bibsWithoutDetection, setBibsWithoutDetection] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,8 +86,8 @@ export default function StatisticsPage() {
     fetch("/api/admin/statistics")
       .then((response) => response.json())
       .then((data) => {
-        setRows(data.rows || []);
         setSummary(data.summary || null);
+        setTimeline(data.timeline || null);
         setBibsWithoutDetection(data.bibsWithoutDetection || []);
       })
       .finally(() => setLoading(false));
@@ -40,6 +110,8 @@ export default function StatisticsPage() {
               ["Teilnehmer mit Uploads", summary.participantsWithVideos, ""],
               ["Teilnehmer mit freigegebenen Videos", summary.participantsWithApprovedVideos, "text-success"],
               ["Teilnehmer mit mehr als 2 Videos", summary.participantsMoreThanTwoVideos.length, ""],
+              ["Abgespielte Videos", summary.playedVideos, "text-success"],
+              ["Verworfen (Screen belegt)", summary.discardedVideos, "text-danger"],
             ].map(([label, value, valueClass]) => (
               <div className="col-sm-6 col-lg-3" key={label}>
                 <div className="card h-100">
@@ -50,6 +122,10 @@ export default function StatisticsPage() {
                 </div>
               </div>
             ))}
+          </div>
+          <h4>Detektionen im Zeitverlauf</h4>
+          <div className="mb-4">
+            {timeline && <DetectionChart timeline={timeline} />}
           </div>
           {summary.participantsMoreThanTwoVideos.length > 0 && (
             <>
@@ -138,35 +214,6 @@ export default function StatisticsPage() {
         </>
       )}
       {loading && <p>Lädt...</p>}
-      {!loading && rows.length === 0 && <p>Noch keine Detektionen vorhanden.</p>}
-      {!loading && rows.length > 0 && (
-        <div className="table-responsive">
-          <table className="table table-striped align-middle">
-            <thead>
-              <tr>
-                <th>Startnummer</th>
-                <th>Video</th>
-                <th>Detektion</th>
-                <th>Abgespielt</th>
-                <th>Status</th>
-                <th>Kommentar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.bib}</td>
-                  <td>{row.videoCount ? `#${row.videoCount}` : "-"}</td>
-                  <td>{formatDate(row.detectedTime)}</td>
-                  <td>{formatDate(row.playedTime)}</td>
-                  <td>{row.status}</td>
-                  <td>{row.remark || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </main>
   );
 }
