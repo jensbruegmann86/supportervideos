@@ -2,11 +2,35 @@
 import { useEffect, useState } from "react";
 import AdminNav from "../AdminNav";
 
-function formatDate(value) {
-  return value ? new Date(value).toLocaleString("de-DE") : "-";
+const CHART_HEIGHT = 200;
+const BAR_PX = 14;
+const TICK_STEPS_MIN = [5, 10, 15, 30, 60, 120, 180, 360, 720, 1440];
+
+// Ticks at round local times; the step is the smallest one that keeps labels from overlapping.
+function buildTicks(buckets, bucketMinutes) {
+  const first = new Date(buckets[0].time);
+  const last = new Date(buckets[buckets.length - 1].time);
+  const multiDay = first.toDateString() !== last.toDateString();
+  const labelPx = multiDay ? 96 : 56;
+  const step =
+    TICK_STEPS_MIN.find((s) => s >= bucketMinutes && (s / bucketMinutes) * BAR_PX >= labelPx) || 1440;
+
+  const ticks = [];
+  buckets.forEach((bucket, index) => {
+    const date = new Date(bucket.time);
+    if ((date.getHours() * 60 + date.getMinutes()) % step !== 0) return;
+    ticks.push({
+      index,
+      label: date.toLocaleString("de-DE", {
+        ...(multiDay ? { day: "2-digit", month: "2-digit" } : {}),
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    });
+  });
+  return ticks;
 }
 
-const CHART_HEIGHT = 200;
 const SERIES = [
   { key: "played", label: "Abgespielt", color: "#198754" },
   { key: "discarded", label: "Verworfen: Screen belegt", color: "#dc3545" },
@@ -19,6 +43,7 @@ function DetectionChart({ timeline }) {
 
   const maxTotal = Math.max(...buckets.map((b) => b.played + b.discarded + b.other), 1);
   const showDate = bucketMinutes >= 60;
+  const ticks = buildTicks(buckets, bucketMinutes);
 
   return (
     <>
@@ -32,11 +57,12 @@ function DetectionChart({ timeline }) {
           </span>
         ))}
         <span className="small text-muted">Intervall: {bucketMinutes} Min.</span>
+        <span className="small text-muted">max. {maxTotal} pro Intervall</span>
       </div>
-      <div style={{ overflowX: "auto" }}>
+      <div style={{ overflowX: "auto", padding: "0 32px" }}>
         <div
           className="d-flex align-items-end"
-          style={{ height: CHART_HEIGHT, minWidth: buckets.length * 14, borderBottom: "1px solid #dee2e6" }}
+          style={{ height: CHART_HEIGHT, minWidth: buckets.length * BAR_PX, borderBottom: "1px solid #dee2e6" }}
         >
           {buckets.map((bucket) => {
             const total = bucket.played + bucket.discarded + bucket.other;
@@ -66,10 +92,22 @@ function DetectionChart({ timeline }) {
             );
           })}
         </div>
-        <div className="d-flex justify-content-between small text-muted mt-1" style={{ minWidth: buckets.length * 14 }}>
-          <span>{formatDate(buckets[0].time)}</span>
-          <span>max. {maxTotal} pro Intervall</span>
-          <span>{formatDate(buckets[buckets.length - 1].time)}</span>
+        <div style={{ position: "relative", height: 36, minWidth: buckets.length * BAR_PX }}>
+          {ticks.map((tick) => (
+            <div
+              key={tick.index}
+              style={{
+                position: "absolute",
+                left: `${(tick.index / buckets.length) * 100}%`,
+                top: 0,
+                transform: "translateX(-50%)",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ width: 1, height: 6, background: "#6c757d", margin: "0 auto" }} />
+              <span className="small text-muted" style={{ whiteSpace: "nowrap" }}>{tick.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </>
