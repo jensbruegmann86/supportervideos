@@ -150,6 +150,8 @@ export default function StatisticsPage() {
               ["Teilnehmer mit mehr als 2 Videos", summary.participantsMoreThanTwoVideos.length, ""],
               ["Abgespielte Videos", summary.playedVideos, "text-success"],
               ["Verworfen (Screen belegt)", summary.discardedVideos, "text-danger"],
+              ["Teilnehmer mit abgespieltem Video", summary.participantsPlayed, "text-success"],
+              ["Teilnehmer verworfen (Screen belegt)", summary.participantsDiscarded, "text-danger"],
             ].map(([label, value, valueClass]) => (
               <div className="col-sm-6 col-lg-3" key={label}>
                 <div className="card h-100">

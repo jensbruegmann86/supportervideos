@@ -90,6 +90,12 @@ export async function GET() {
     participantsMoreThanTwoVideos,
     playedVideos: rows.filter((row) => row.status === STATUS_PLAYED).length,
     discardedVideos: rows.filter((row) => row.status === STATUS_DISCARDED).length,
+    participantsPlayed: new Set(
+      rows.filter((row) => row.status === STATUS_PLAYED).map((row) => String(row.bib).trim())
+    ).size,
+    participantsDiscarded: new Set(
+      rows.filter((row) => row.status === STATUS_DISCARDED).map((row) => String(row.bib).trim())
+    ).size,
     race: raceStats,
   };
 
