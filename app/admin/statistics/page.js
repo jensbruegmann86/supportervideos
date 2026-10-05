@@ -9,6 +9,7 @@ function formatDate(value) {
 export default function StatisticsPage() {
   const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [bibsWithoutDetection, setBibsWithoutDetection] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function StatisticsPage() {
       .then((data) => {
         setRows(data.rows || []);
         setSummary(data.summary || null);
+        setBibsWithoutDetection(data.bibsWithoutDetection || []);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -100,6 +102,39 @@ export default function StatisticsPage() {
               </tbody>
             </table>
           </div>
+        </>
+      )}
+      {!loading && (
+        <>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h4 className="mb-0">Startnummern ohne Detektion ({bibsWithoutDetection.length})</h4>
+            {bibsWithoutDetection.length > 0 && (
+              <a className="btn btn-outline-primary btn-sm" href="/api/admin/statistics/export-no-detection">
+                XLSX-Export
+              </a>
+            )}
+          </div>
+          {bibsWithoutDetection.length === 0 ? (
+            <p>Alle Startnummern mit freigegebenem Video wurden detektiert.</p>
+          ) : (
+            <div className="table-responsive mb-4" style={{ maxHeight: "400px", overflowY: "auto" }}>
+              <table className="table table-bordered table-striped align-middle">
+                <thead>
+                  <tr><th>Startnummer</th><th>Teilnehmer</th><th>Strecke</th><th>Freigegebene Videos</th></tr>
+                </thead>
+                <tbody>
+                  {bibsWithoutDetection.map((row) => (
+                    <tr key={row.bib}>
+                      <td>{row.bib}</td>
+                      <td>{row.name || "-"}</td>
+                      <td>{row.race || "-"}</td>
+                      <td>{row.videos}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
       {loading && <p>Lädt...</p>}

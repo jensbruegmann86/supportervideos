@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
+import { getBibsWithoutDetection } from "../../../../lib/missingDetections";
 
 async function getAllVideos(supabase) {
   const pageSize = 1000;
@@ -123,5 +124,8 @@ export async function GET() {
     };
   });
 
-  return NextResponse.json({ rows, summary });
+  const { data: bibsWithoutDetection, error: missingError } = await getBibsWithoutDetection(supabase);
+  if (missingError) return NextResponse.json({ error: missingError.message }, { status: 500 });
+
+  return NextResponse.json({ rows, summary, bibsWithoutDetection });
 }
